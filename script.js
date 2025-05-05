@@ -1,13 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Audio elements for alarms
-    const alarm1 = new Audio();
-    const alarm2 = new Audio();
-    const alarm3 = new Audio();
+    // Create audio objects for all beep sounds
+    const beepSounds = {
+        beep1: new Audio('./sounds/Beep 1.wav'),
+        beep2: new Audio('./sounds/Beep 2.wav'),
+        beep3: new Audio('./sounds/Beep 3.wav'),
+        beep4: new Audio('./sounds/Beep 4.wav'),
+        beep5: new Audio('./sounds/Beep 5.wav'),
+        beep6: new Audio('./sounds/Beep 6.wav'),
+        beep7: new Audio('./sounds/Beep 7.wav'),
+        beep8: new Audio('./sounds/Beep 8.wav'),
+        beep9: new Audio('./sounds/Beep 9.wav')
+    };
     
-    // Set up alarm sounds using base64 data
-    alarm1.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAJrQBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dX///////////8AAAA5TEFNRTMuOTlyAm4AAAAALgkAABRGJAN7TgAARgAACa3SsOqYAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuOTkuNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=";
-    alarm2.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAMAAAThwAUFBQUFBQsLCwsLCxERERERERmZmZmZmaGhoaGhoampqampqbFxcXFxcXi4uLi4uL///////////////////8AAAA5TEFNRTMuOTlyAm4AAAAALiEAABRGJAOmTgAARgAAE4c+M9qQAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuOTkuNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=";
-    alarm3.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAKAAAKYgAbGxsbGxsfHx8fHx8zMzMzMzNGRkZGRkZtbW1tbW15eXl5eXl5iYmJiYmJubm5ubm5ucnJycnJyfLy8vLy8v///////////wAAADJMQU1FMy45OS41VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMQAAAGkAAAAAAAANIAAAARMQU1FMy45OS41VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==";
+    // Current playing sounds
+    let currentlyPlayingSound = null;
 
     // Create timer objects to store state for each timer
     const timers = {};
@@ -142,15 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedAlarm = soundSelect.value;
             if (selectedAlarm === 'none') return;
             
-            if (selectedAlarm === 'alarm1') {
-                alarm1.loop = true;
-                alarm1.play();
-            } else if (selectedAlarm === 'alarm2') {
-                alarm2.loop = true;
-                alarm2.play();
-            } else if (selectedAlarm === 'alarm3') {
-                alarm3.loop = true;
-                alarm3.play();
+            if (beepSounds[selectedAlarm]) {
+                beepSounds[selectedAlarm].loop = true;
+                beepSounds[selectedAlarm].play();
+                currentlyPlayingSound = selectedAlarm;
             }
         }
         
@@ -160,15 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedAlarm = soundSelect.value;
             if (selectedAlarm === 'none') return;
             
-            if (selectedAlarm === 'alarm1') {
-                alarm1.loop = false;
-                alarm1.play();
-            } else if (selectedAlarm === 'alarm2') {
-                alarm2.loop = false;
-                alarm2.play();
-            } else if (selectedAlarm === 'alarm3') {
-                alarm3.loop = false;
-                alarm3.play();
+            if (beepSounds[selectedAlarm]) {
+                beepSounds[selectedAlarm].loop = false;
+                beepSounds[selectedAlarm].play();
             }
         }
         
@@ -200,11 +195,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Function to stop all alarm sounds across all timers
     function stopAllAlarms() {
-        alarm1.pause();
-        alarm1.currentTime = 0;
-        alarm2.pause();
-        alarm2.currentTime = 0;
-        alarm3.pause();
-        alarm3.currentTime = 0;
+        // Stop all beep sounds
+        for (const sound in beepSounds) {
+            beepSounds[sound].pause();
+            beepSounds[sound].currentTime = 0;
+        }
+        currentlyPlayingSound = null;
     }
 });
