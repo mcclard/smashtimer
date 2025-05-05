@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // DOM Elements
         const timerDisplay = document.getElementById(`timer-${timerIndex}`);
         const startBtn = document.querySelector(`.start-btn[data-timer="${timerIndex}"]`);
+        const stopBtn = document.querySelector(`.stop-btn[data-timer="${timerIndex}"]`);
         const pauseBtn = document.querySelector(`.pause-btn[data-timer="${timerIndex}"]`);
         const resetBtn = document.querySelector(`.reset-btn[data-timer="${timerIndex}"]`);
         const presetBtns = document.querySelectorAll(`.preset-btn[data-timer="${timerIndex}"]`);
@@ -96,6 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
             timers[timerIndex].isRunning = false;
         }
         
+        // Stop the timer (complete stop, not pause)
+        function stopTimer() {
+            pauseTimer();
+            timers[timerIndex].timeLeft = 0;
+            updateDisplay();
+            container.style.animation = '';
+            stopAlarm();
+        }
+        
         // Reset the timer
         function resetTimer() {
             pauseTimer();
@@ -149,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedAlarm === 'none') return;
             
             if (beepSounds[selectedAlarm]) {
+                // Set to play only once, not looping
                 beepSounds[selectedAlarm].loop = false;
                 beepSounds[selectedAlarm].play();
                 currentlyPlayingSound = selectedAlarm;
@@ -172,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Event Listeners
         startBtn.addEventListener('click', startTimer);
+        stopBtn.addEventListener('click', stopTimer);
         pauseBtn.addEventListener('click', pauseTimer);
         resetBtn.addEventListener('click', resetTimer);
         
