@@ -13,6 +13,9 @@ for (let i = 1; i <= 9; i++) {
 window.onload = function() {
     // Set the initial timer to 2 minutes (120 seconds)
     initializeTimer(1);
+    
+    // Add event listeners for the first timer
+    addButtonListeners(1);
 };
 
 // Create a new timer with the given ID
@@ -26,6 +29,86 @@ function initializeTimer(timerId) {
     
     // Update the display to show 2 minutes
     updateTimerDisplay(timerId);
+}
+
+// Add all button listeners for a timer
+function addButtonListeners(timerId) {
+    const timerContainer = document.getElementById(`timer-${timerId}`);
+    if (!timerContainer) return;
+    
+    // Start button
+    const startBtn = timerContainer.querySelector('.start-btn');
+    if (startBtn) {
+        startBtn.addEventListener('click', function() {
+            startTimer(timerId);
+        });
+    }
+    
+    // Stop button
+    const stopBtn = timerContainer.querySelector('.stop-btn');
+    if (stopBtn) {
+        stopBtn.addEventListener('click', function() {
+            stopTimer(timerId);
+        });
+    }
+    
+    // Pause button
+    const pauseBtn = timerContainer.querySelector('.pause-btn');
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', function() {
+            pauseTimer(timerId);
+        });
+    }
+    
+    // Reset button
+    const resetBtn = timerContainer.querySelector('.reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            resetTimer(timerId);
+        });
+    }
+    
+    // Preset time buttons
+    const presetBtns = timerContainer.querySelectorAll('.preset-btn');
+    presetBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const time = parseInt(btn.getAttribute('data-time'));
+            setPresetTime(timerId, time);
+        });
+    });
+    
+    // Add time button
+    const addTimeBtn = timerContainer.querySelector('.add-btn');
+    if (addTimeBtn) {
+        addTimeBtn.addEventListener('click', function() {
+            const time = parseInt(addTimeBtn.getAttribute('data-add'));
+            addTime(timerId, time);
+        });
+    }
+    
+    // Set custom time button
+    const setCustomBtn = timerContainer.querySelector('.set-custom-btn');
+    if (setCustomBtn) {
+        setCustomBtn.addEventListener('click', function() {
+            setCustomTime(timerId);
+        });
+    }
+    
+    // Test sound button
+    const testSoundBtn = timerContainer.querySelector('.test-sound-btn');
+    if (testSoundBtn) {
+        testSoundBtn.addEventListener('click', function() {
+            testSound(timerId);
+        });
+    }
+    
+    // Delete button (if it exists)
+    const deleteBtn = timerContainer.querySelector('.delete-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            deleteTimer(timerId);
+        });
+    }
 }
 
 // Format seconds as MM:SS
@@ -236,7 +319,104 @@ function addNewTimer() {
     const timerHTML = `
     <div class="timer-container" id="timer-${timerId}">
         <div class="delete-btn-container">
-            <button class="delete-btn" onclick="deleteTimer(${timerId})">×</button>
+            <button class="delete-btn" data-timer="${timerId}">×</button>
+        </div>
+        
+        <div class="pc-name-container">
+            <input type="text" class="pc-name" placeholder="Character Name">
+        </div>
+        
+        <div class="timer-display">00:00</div>
+        
+        <div class="time-presets">
+            <button class="preset-btn" data-time="60">1 min</button>
+            <button class="preset-btn" data-time="120">2 min</button>
+            <button class="preset-btn" data-time="180">3 min</button>
+            <button class="preset-btn" data-time="300">5 min</button>
+        </div>
+        
+        <div class="add-time">
+            <button class="add-btn" data-add="30">+30 sec</button>
+        </div>
+        
+        <div class="custom-time">
+            <input type="number" class="minutes-input" min="0" max="60" value="2">
+            <label>min</label>
+            <input type="number" class="seconds-input" min="0" max="59" value="0">
+            <label>sec</label>
+            <button class="btn set-custom-btn">Set Time</button>
+        </div>
+        
+        <div class="alarm-sound">
+            <label>Alarm:</label>
+            <select class="sound-select">
+                <option value="none" selected>None</option>
+                <option value="beep1">Beep 1</option>
+                <option value="beep2">Beep 2</option>
+                <option value="beep3">Beep 3</option>
+                <option value="beep4">Beep 4</option>
+                <option value="beep5">Beep 5</option>
+                <option value="beep6">Beep 6</option>
+                <option value="beep7">Beep 7</option>
+                <option value="beep8">Beep 8</option>
+                <option value="beep9">Beep 9</option>
+            </select>
+            <button class="btn test-sound-btn">Test</button>
+        </div>
+        
+        <div class="controls">
+            <button class="btn start-btn large-btn">Start</button>
+            <button class="btn stop-btn">Stop</button>
+            <button class="btn pause-btn">Pause</button>
+            <button class="btn btn-danger reset-btn">Reset</button>
+        </div>
+    </div>
+    `;
+    
+    // Add the new timer before the add button
+    const addButton = document.getElementById('add-timer-btn');
+    addButton.insertAdjacentHTML('beforebegin', timerHTML);
+    
+    // Initialize the timer
+    initializeTimer(timerId);
+    
+    // Add the event listeners
+    addButtonListeners(timerId);
+    
+    // Hide add button if maximum is reached
+    if (Object.keys(timers).length >= maxTimers) {
+        addButton.style.display = 'none';
+    }
+}
+
+// Delete a timer
+function deleteTimer(timerId) {
+    // Can't delete timer 1 (first timer)
+    if (timerId === 1) {
+        alert('Cannot delete the first timer');
+        return;
+    }
+    
+    // Stop the timer if it's running
+    if (timers[timerId] && timers[timerId].isRunning) {
+        pauseTimer(timerId);
+    }
+    
+    // Remove from the DOM
+    const timerElement = document.getElementById(`timer-${timerId}`);
+    if (timerElement) {
+        timerElement.remove();
+    }
+    
+    // Remove from tracking
+    delete timers[timerId];
+    
+    // Show the add button if it was hidden
+    document.getElementById('add-timer-btn').style.display = 'flex';
+}
+
+// Set up add button event listener
+document.getElementById('add-timer-btn').addEventListener('click', addNewTimer);<button class="delete-btn" onclick="deleteTimer(${timerId})">×</button>
         </div>
         
         <div class="pc-name-container">
