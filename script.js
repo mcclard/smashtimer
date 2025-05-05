@@ -14,6 +14,142 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Current playing sounds
     let currentlyPlayingSound = null;
+    
+    // Track the timers
+    const timers = {};
+    let timerCount = 1;
+    const maxTimers = 8;
+    
+    // Initialize the first timer
+    initializeTimer(1);
+    
+    // Set up event listeners for dynamic timer creation and deletion
+    document.getElementById('add-timer-btn').addEventListener('click', addNewTimer);
+    
+    // Add event delegation for delete buttons
+    document.querySelector('.timers-container').addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-btn')) {
+            const timerIndex = parseInt(e.target.getAttribute('data-timer'));
+            deleteTimer(timerIndex);
+        }
+    });
+    
+    // Function to add a new timer
+    function addNewTimer() {
+        // Check if we've reached the maximum number of timers
+        if (Object.keys(timers).length >= maxTimers) {
+            alert('Maximum number of timers reached (8)');
+            return;
+        }
+        
+        // Find the next available timer index
+        let newIndex = timerCount + 1;
+        while (document.getElementById(`timer-container-${newIndex}`)) {
+            newIndex++;
+        }
+        timerCount = newIndex;
+        
+        // Create new timer HTML
+        const newTimerHTML = createTimerHTML(newIndex);
+        
+        // Insert the new timer before the add button
+        const addButton = document.getElementById('add-timer-btn');
+        addButton.insertAdjacentHTML('beforebegin', newTimerHTML);
+        
+        // Initialize the new timer
+        initializeTimer(newIndex);
+        
+        // Hide add button if max timers reached
+        if (Object.keys(timers).length >= maxTimers) {
+            document.getElementById('add-timer-btn').style.display = 'none';
+        }
+    }
+    
+    // Function to delete a timer
+    function deleteTimer(index) {
+        // Don't delete if it's the last timer
+        if (Object.keys(timers).length <= 1) {
+            alert('At least one timer must remain');
+            return;
+        }
+        
+        // Stop the timer if it's running
+        if (timers[index] && timers[index].isRunning) {
+            clearInterval(timers[index].timerId);
+        }
+        
+        // Remove the timer from the DOM
+        const timerElement = document.getElementById(`timer-container-${index}`);
+        if (timerElement) {
+            timerElement.remove();
+        }
+        
+        // Remove the timer from our tracking object
+        delete timers[index];
+        
+        // Show add button if it was hidden
+        document.getElementById('add-timer-btn').style.display = 'flex';
+    }
+    
+    // Function to create timer HTML
+    function createTimerHTML(index) {
+        return `
+        <div class="container" id="timer-container-${index}" data-index="${index}">
+            <div class="delete-btn-container">
+                <button class="delete-btn" data-timer="${index}">×</button>
+            </div>
+            
+            <div class="pc-name-container">
+                <input type="text" class="pc-name" id="pc-name-${index}" placeholder="Character Name">
+            </div>
+            
+            <div class="timer-display" id="timer-${index}">00:00</div>
+            
+            <div class="time-presets">
+                <button class="preset-btn" data-time="60" data-timer="${index}">1 min</button>
+                <button class="preset-btn" data-time="120" data-timer="${index}">2 min</button>
+                <button class="preset-btn" data-time="180" data-timer="${index}">3 min</button>
+                <button class="preset-btn" data-time="300" data-timer="${index}">5 min</button>
+            </div>
+            
+            <div class="add-time">
+                <button class="add-btn" data-add="30" data-timer="${index}">+30 sec</button>
+            </div>
+            
+            <div class="custom-time">
+                <input type="number" class="minutes" id="minutes-${index}" min="0" max="60" value="2">
+                <label for="minutes-${index}">min</label>
+                <input type="number" class="seconds" id="seconds-${index}" min="0" max="59" value="0">
+                <label for="seconds-${index}">sec</label>
+                <button class="btn set-custom-btn" data-timer="${index}">Set Time</button>
+            </div>
+            
+            <div class="alarm-sound">
+                <label for="sound-select-${index}">Alarm:</label>
+                <select class="sound-select" id="sound-select-${index}" data-timer="${index}">
+                    <option value="none" selected>None</option>
+                    <option value="beep1">Beep 1</option>
+                    <option value="beep2">Beep 2</option>
+                    <option value="beep3">Beep 3</option>
+                    <option value="beep4">Beep 4</option>
+                    <option value="beep5">Beep 5</option>
+                    <option value="beep6">Beep 6</option>
+                    <option value="beep7">Beep 7</option>
+                    <option value="beep8">Beep 8</option>
+                    <option value="beep9">Beep 9</option>
+                </select>
+                <button class="btn test-sound-btn" data-timer="${index}">Test</button>
+            </div>
+            
+            <div class="controls">
+                <button class="btn start-btn large-btn" data-timer="${index}">Start</button>
+                <button class="btn stop-btn" data-timer="${index}">Stop</button>
+                <button class="btn pause-btn" data-timer="${index}">Pause</button>
+                <button class="btn btn-danger reset-btn" data-timer="${index}">Reset</button>
+            </div>
+        </div>
+        `;
+    }
 
     // Create timer objects to store state for each timer
     const timers = {};
