@@ -210,4 +210,90 @@ footer {
 
 /* Animation for when timer reaches zero */
 @keyframes danger-flash {
-    0% { box-shadow: 0 0 20px rgba(255, 0
+    0% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); border-color: #f00; }
+    50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); border-color: #ff5555; }
+    100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); border-color: #f00; }
+}
+
+.danger {
+    animation: danger-flash 0.5s infinite;
+    color: #f00;
+    text-shadow: 0 0 15px rgba(255, 0, 0, 0.9);
+}
+
+/* Animation for when timer is below 10 seconds */
+@keyframes warning-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.warning {
+    color: #ff0;
+    text-shadow: 0 0 15px rgba(255, 255, 0, 0.9);
+    animation: warning-pulse 1s infinite;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .timers-container {
+        padding: 0 10px;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .timer-display {
+        font-size: 3.5rem;
+        margin: 10px 0;
+    }
+    
+    .controls {
+        gap: 5px;
+    }
+    
+    .btn, .preset-btn, .add-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .custom-time input {
+        width: 45px;
+        padding: 5px;
+        font-size: 0.8rem;
+    }
+    
+    .pc-name {
+        font-size: 1rem;
+        padding: 6px 10px;
+    }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .timer-display {
+        font-size: 3rem;
+    }
+    
+    .pc-name {
+        width: 90%;
+    }
+    
+    .time-presets, .add-time, .custom-time, .controls, .alarm-sound {
+        gap: 4px;
+    }
+    
+    .btn, .preset-btn, .add-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+}
