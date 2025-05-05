@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedAlarm === 'none') return;
             
             if (beepSounds[selectedAlarm]) {
-                beepSounds[selectedAlarm].loop = true;
+                beepSounds[selectedAlarm].loop = false;
                 beepSounds[selectedAlarm].play();
                 currentlyPlayingSound = selectedAlarm;
             }
