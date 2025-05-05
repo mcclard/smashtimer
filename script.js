@@ -101,8 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
         function stopTimer() {
             pauseTimer();
             timers[timerIndex].timeLeft = 0;
-            updateDisplay();
-            container.style.animation = '';
+            
+            // Remove warning and danger classes to stop animation
+            timerDisplay.classList.remove('warning', 'danger');
+            container.style.animation = 'none';
+            
+            // Update display with zeros
+            timerDisplay.textContent = "00:00";
+            
             stopAlarm();
         }
         
