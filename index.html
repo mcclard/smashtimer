@@ -22,14 +22,14 @@
             <div class="timer-display">00:00</div>
             
             <div class="time-presets">
-                <button class="preset-btn" onclick="setPresetTime(1, 60)">1 min</button>
-                <button class="preset-btn" onclick="setPresetTime(1, 120)">2 min</button>
-                <button class="preset-btn" onclick="setPresetTime(1, 180)">3 min</button>
-                <button class="preset-btn" onclick="setPresetTime(1, 300)">5 min</button>
+                <button class="preset-btn" data-time="60">1 min</button>
+                <button class="preset-btn" data-time="120">2 min</button>
+                <button class="preset-btn" data-time="180">3 min</button>
+                <button class="preset-btn" data-time="300">5 min</button>
             </div>
             
             <div class="add-time">
-                <button class="add-btn" onclick="addTime(1, 30)">+30 sec</button>
+                <button class="add-btn" data-add="30">+30 sec</button>
             </div>
             
             <div class="custom-time">
@@ -37,7 +37,7 @@
                 <label>min</label>
                 <input type="number" class="seconds-input" min="0" max="59" value="0">
                 <label>sec</label>
-                <button class="btn set-custom-btn" onclick="setCustomTime(1)">Set Time</button>
+                <button class="btn set-custom-btn">Set Time</button>
             </div>
             
             <div class="alarm-sound">
@@ -54,14 +54,14 @@
                     <option value="beep8">Beep 8</option>
                     <option value="beep9">Beep 9</option>
                 </select>
-                <button class="btn test-sound-btn" onclick="testSound(1)">Test</button>
+                <button class="btn test-sound-btn">Test</button>
             </div>
             
             <div class="controls">
-                <button class="btn start-btn large-btn" onclick="startTimer(1)">Start</button>
-                <button class="btn stop-btn" onclick="stopTimer(1)">Stop</button>
-                <button class="btn pause-btn" onclick="pauseTimer(1)">Pause</button>
-                <button class="btn btn-danger reset-btn" onclick="resetTimer(1)">Reset</button>
+                <button class="btn start-btn large-btn">Start</button>
+                <button class="btn stop-btn">Stop</button>
+                <button class="btn pause-btn">Pause</button>
+                <button class="btn btn-danger reset-btn">Reset</button>
             </div>
         </div>
 
