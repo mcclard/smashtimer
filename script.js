@@ -1,381 +1,330 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Create audio objects for all beep sounds
-    const beepSounds = {
-        beep1: new Audio('./sounds/Beep 1.wav'),
-        beep2: new Audio('./sounds/Beep 2.wav'),
-        beep3: new Audio('./sounds/Beep 3.wav'),
-        beep4: new Audio('./sounds/Beep 4.wav'),
-        beep5: new Audio('./sounds/Beep 5.wav'),
-        beep6: new Audio('./sounds/Beep 6.wav'),
-        beep7: new Audio('./sounds/Beep 7.wav'),
-        beep8: new Audio('./sounds/Beep 8.wav'),
-        beep9: new Audio('./sounds/Beep 9.wav')
+// Timer data storage - maps timer IDs to their data
+const timers = {};
+let nextTimerId = 2; // Start at 2 since we begin with timer ID 1
+const maxTimers = 8;
+
+// Sound setup
+const beepSounds = {};
+for (let i = 1; i <= 9; i++) {
+    beepSounds[`beep${i}`] = new Audio(`./sounds/Beep ${i}.wav`);
+}
+
+// Initialize when the page is loaded
+window.onload = function() {
+    // Set the initial timer to 2 minutes (120 seconds)
+    initializeTimer(1);
+};
+
+// Create a new timer with the given ID
+function initializeTimer(timerId) {
+    // Initialize the timer data
+    timers[timerId] = {
+        timeLeft: 120, // 2 minutes default
+        timerId: null,
+        isRunning: false
     };
     
-    // Current playing sounds
-    let currentlyPlayingSound = null;
+    // Update the display to show 2 minutes
+    updateTimerDisplay(timerId);
+}
+
+// Format seconds as MM:SS
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+}
+
+// Update the timer display for a specific timer
+function updateTimerDisplay(timerId) {
+    const timerContainer = document.getElementById(`timer-${timerId}`);
+    if (!timerContainer) return;
     
-    // Track the timers
-    const timers = {};
-    let timerCount = 1;
-    const maxTimers = 8;
+    const timerDisplay = timerContainer.querySelector('.timer-display');
     
-    // Initialize the first timer
-    initializeTimer(1);
+    // Update the time display
+    timerDisplay.textContent = formatTime(timers[timerId].timeLeft);
     
-    // Set up event listeners for dynamic timer creation
-    document.getElementById('add-timer-btn').addEventListener('click', addNewTimer);
+    // Reset visual classes
+    timerDisplay.classList.remove('warning', 'danger');
+    timerContainer.style.animation = '';
     
-    // Use event delegation for all timer buttons
-    document.querySelector('.timers-container').addEventListener('click', function(e) {
-        // Handle delete buttons
-        if (e.target.classList.contains('delete-btn')) {
-            const timerIndex = parseInt(e.target.getAttribute('data-timer'));
-            deleteTimer(timerIndex);
-            return;
-        }
-        
-        // Find the closest button if we clicked on one
-        const button = e.target.closest('button');
-        if (!button) return; // Not a button click
-        
-        // Get the timer index from the data attribute
-        const timerIndex = parseInt(button.getAttribute('data-timer'));
-        if (!timerIndex || !timers[timerIndex]) return; // Invalid timer
-        
-        // Handle different button types
-        if (button.classList.contains('start-btn')) {
-            startTimer(timerIndex);
-        } else if (button.classList.contains('stop-btn')) {
-            stopTimer(timerIndex);
-        } else if (button.classList.contains('pause-btn')) {
-            pauseTimer(timerIndex);
-        } else if (button.classList.contains('reset-btn')) {
-            resetTimer(timerIndex);
-        } else if (button.classList.contains('preset-btn')) {
-            const time = parseInt(button.getAttribute('data-time'));
-            setPresetTime(timerIndex, time);
-        } else if (button.classList.contains('add-btn')) {
-            const time = parseInt(button.getAttribute('data-add'));
-            addTime(timerIndex, time);
-        } else if (button.classList.contains('set-custom-btn')) {
-            setCustomTime(timerIndex);
-        } else if (button.classList.contains('test-sound-btn')) {
-            testSound(timerIndex);
-        }
-    });
-    
-    // Function to add a new timer
-    function addNewTimer() {
-        // Check if we've reached the maximum number of timers
-        if (Object.keys(timers).length >= maxTimers) {
-            alert('Maximum number of timers reached (8)');
-            return;
-        }
-        
-        // Find the next available timer index
-        let newIndex = timerCount + 1;
-        while (document.getElementById(`timer-container-${newIndex}`)) {
-            newIndex++;
-        }
-        timerCount = newIndex;
-        
-        // Create new timer HTML
-        const newTimerHTML = createTimerHTML(newIndex);
-        
-        // Insert the new timer before the add button
-        const addButton = document.getElementById('add-timer-btn');
-        addButton.insertAdjacentHTML('beforebegin', newTimerHTML);
-        
-        // Initialize the new timer
-        initializeTimer(newIndex);
-        
-        // Hide add button if max timers reached
-        if (Object.keys(timers).length >= maxTimers) {
-            document.getElementById('add-timer-btn').style.display = 'none';
-        }
+    // Apply warning class for low time
+    if (timers[timerId].timeLeft <= 10 && timers[timerId].timeLeft > 0) {
+        timerDisplay.classList.add('warning');
     }
     
-    // Function to delete a timer
-    function deleteTimer(index) {
-        // Don't delete if it's the last timer
-        if (Object.keys(timers).length <= 1) {
-            alert('At least one timer must remain');
-            return;
+    // Apply danger class and play sound when time is up
+    if (timers[timerId].timeLeft === 0) {
+        timerDisplay.classList.add('danger');
+        timerContainer.style.animation = 'danger-flash 0.5s infinite';
+        playAlarmSound(timerId);
+    }
+}
+
+// Start a timer
+function startTimer(timerId) {
+    if (!timers[timerId] || timers[timerId].isRunning) return;
+    
+    timers[timerId].isRunning = true;
+    timers[timerId].timerId = setInterval(function() {
+        if (timers[timerId].timeLeft > 0) {
+            timers[timerId].timeLeft--;
+            updateTimerDisplay(timerId);
+        } else {
+            clearInterval(timers[timerId].timerId);
+            timers[timerId].isRunning = false;
         }
-        
-        // Stop the timer if it's running
-        if (timers[index] && timers[index].isRunning) {
-            clearInterval(timers[index].timerId);
-        }
-        
-        // Remove the timer from the DOM
-        const timerElement = document.getElementById(`timer-container-${index}`);
-        if (timerElement) {
-            timerElement.remove();
-        }
-        
-        // Remove the timer from our tracking object
-        delete timers[index];
-        
-        // Show add button if it was hidden
-        document.getElementById('add-timer-btn').style.display = 'flex';
-    }
+    }, 1000);
+}
+
+// Pause a timer
+function pauseTimer(timerId) {
+    if (!timers[timerId]) return;
     
-    // Function to create timer HTML
-    function createTimerHTML(index) {
-        return `
-        <div class="container" id="timer-container-${index}" data-index="${index}">
-            <div class="delete-btn-container">
-                <button class="delete-btn" data-timer="${index}">×</button>
-            </div>
-            
-            <div class="pc-name-container">
-                <input type="text" class="pc-name" id="pc-name-${index}" placeholder="Character Name">
-            </div>
-            
-            <div class="timer-display" id="timer-${index}">00:00</div>
-            
-            <div class="time-presets">
-                <button class="preset-btn" data-time="60" data-timer="${index}">1 min</button>
-                <button class="preset-btn" data-time="120" data-timer="${index}">2 min</button>
-                <button class="preset-btn" data-time="180" data-timer="${index}">3 min</button>
-                <button class="preset-btn" data-time="300" data-timer="${index}">5 min</button>
-            </div>
-            
-            <div class="add-time">
-                <button class="add-btn" data-add="30" data-timer="${index}">+30 sec</button>
-            </div>
-            
-            <div class="custom-time">
-                <input type="number" class="minutes" id="minutes-${index}" min="0" max="60" value="2">
-                <label for="minutes-${index}">min</label>
-                <input type="number" class="seconds" id="seconds-${index}" min="0" max="59" value="0">
-                <label for="seconds-${index}">sec</label>
-                <button class="btn set-custom-btn" data-timer="${index}">Set Time</button>
-            </div>
-            
-            <div class="alarm-sound">
-                <label for="sound-select-${index}">Alarm:</label>
-                <select class="sound-select" id="sound-select-${index}" data-timer="${index}">
-                    <option value="none" selected>None</option>
-                    <option value="beep1">Beep 1</option>
-                    <option value="beep2">Beep 2</option>
-                    <option value="beep3">Beep 3</option>
-                    <option value="beep4">Beep 4</option>
-                    <option value="beep5">Beep 5</option>
-                    <option value="beep6">Beep 6</option>
-                    <option value="beep7">Beep 7</option>
-                    <option value="beep8">Beep 8</option>
-                    <option value="beep9">Beep 9</option>
-                </select>
-                <button class="btn test-sound-btn" data-timer="${index}">Test</button>
-            </div>
-            
-            <div class="controls">
-                <button class="btn start-btn large-btn" data-timer="${index}">Start</button>
-                <button class="btn stop-btn" data-timer="${index}">Stop</button>
-                <button class="btn pause-btn" data-timer="${index}">Pause</button>
-                <button class="btn btn-danger reset-btn" data-timer="${index}">Reset</button>
-            </div>
-        </div>
-        `;
-    }
+    clearInterval(timers[timerId].timerId);
+    timers[timerId].isRunning = false;
+}
+
+// Stop a timer completely (set to 0 and stop)
+function stopTimer(timerId) {
+    if (!timers[timerId]) return;
     
-    // Function to initialize a single timer
-    function initializeTimer(timerIndex) {
-        // Create timer state object
-        timers[timerIndex] = {
-            timeLeft: 120, // Default 2 minutes
-            timerId: null,
-            isRunning: false
-        };
-        
-        // Update the display initially
-        updateDisplay(timerIndex);
-    }
+    pauseTimer(timerId);
+    timers[timerId].timeLeft = 0;
     
-    // Format time as MM:SS
-    function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-        const secs = (seconds % 60).toString().padStart(2, '0');
-        return `${mins}:${secs}`;
-    }
-    
-    // Update timer display
-    function updateDisplay(timerIndex) {
-        const timerDisplay = document.getElementById(`timer-${timerIndex}`);
-        const container = document.getElementById(`timer-container-${timerIndex}`);
-        if (!timerDisplay || !container) return;
+    const timerContainer = document.getElementById(`timer-${timerId}`);
+    if (timerContainer) {
+        const timerDisplay = timerContainer.querySelector('.timer-display');
         
-        timerDisplay.textContent = formatTime(timers[timerIndex].timeLeft);
-        
-        // Reset classes
+        // Clear warning/danger classes
         timerDisplay.classList.remove('warning', 'danger');
-        container.style.animation = '';
+        timerContainer.style.animation = 'none';
         
-        // Add warning class when time is below 10 seconds
-        if (timers[timerIndex].timeLeft <= 10 && timers[timerIndex].timeLeft > 0) {
-            timerDisplay.classList.add('warning');
-        }
-        
-        // Add danger class when time is up
-        if (timers[timerIndex].timeLeft === 0) {
-            timerDisplay.classList.add('danger');
-            container.style.animation = 'danger-flash 0.5s infinite';
-            playAlarm(timerIndex);
-        }
-    }
-    
-    // Start the timer
-    function startTimer(timerIndex) {
-        if (!timers[timerIndex].isRunning) {
-            timers[timerIndex].isRunning = true;
-            timers[timerIndex].timerId = setInterval(() => {
-                if (timers[timerIndex].timeLeft > 0) {
-                    timers[timerIndex].timeLeft--;
-                    updateDisplay(timerIndex);
-                } else {
-                    clearInterval(timers[timerIndex].timerId);
-                    timers[timerIndex].isRunning = false;
-                }
-            }, 1000);
-        }
-    }
-    
-    // Pause the timer
-    function pauseTimer(timerIndex) {
-        clearInterval(timers[timerIndex].timerId);
-        timers[timerIndex].isRunning = false;
-    }
-    
-    // Stop the timer (complete stop, not pause)
-    function stopTimer(timerIndex) {
-        pauseTimer(timerIndex);
-        timers[timerIndex].timeLeft = 0;
-        
-        const timerDisplay = document.getElementById(`timer-${timerIndex}`);
-        const container = document.getElementById(`timer-container-${timerIndex}`);
-        if (!timerDisplay || !container) return;
-        
-        // Remove warning and danger classes to stop animation
-        timerDisplay.classList.remove('warning', 'danger');
-        container.style.animation = 'none';
-        
-        // Update display with zeros
+        // Update display to 00:00
         timerDisplay.textContent = "00:00";
         
+        // Stop any playing alarms
+        stopAllAlarms();
+    }
+}
+
+// Reset a timer to 2 minutes
+function resetTimer(timerId) {
+    if (!timers[timerId]) return;
+    
+    pauseTimer(timerId);
+    timers[timerId].timeLeft = 120; // 2 minutes
+    
+    const timerContainer = document.getElementById(`timer-${timerId}`);
+    if (timerContainer) {
+        timerContainer.style.animation = '';
+    }
+    
+    updateTimerDisplay(timerId);
+    stopAllAlarms();
+}
+
+// Set a timer to a preset time value
+function setPresetTime(timerId, seconds) {
+    if (!timers[timerId]) return;
+    
+    pauseTimer(timerId);
+    timers[timerId].timeLeft = seconds;
+    
+    const timerContainer = document.getElementById(`timer-${timerId}`);
+    if (timerContainer) {
+        timerContainer.style.animation = '';
+    }
+    
+    updateTimerDisplay(timerId);
+    stopAllAlarms();
+}
+
+// Add time to a timer
+function addTime(timerId, seconds) {
+    if (!timers[timerId]) return;
+    
+    timers[timerId].timeLeft += seconds;
+    
+    // If timer was at 0, stop alert effects
+    if (timers[timerId].timeLeft > 0) {
+        const timerContainer = document.getElementById(`timer-${timerId}`);
+        if (timerContainer) {
+            timerContainer.style.animation = '';
+        }
         stopAllAlarms();
     }
     
-    // Reset the timer
-    function resetTimer(timerIndex) {
-        pauseTimer(timerIndex);
-        timers[timerIndex].timeLeft = 120; // Reset to default 2 minutes
-        updateDisplay(timerIndex);
-        
-        const container = document.getElementById(`timer-container-${timerIndex}`);
-        if (container) {
-            container.style.animation = '';
-        }
-        
+    updateTimerDisplay(timerId);
+}
+
+// Set a custom time from inputs
+function setCustomTime(timerId) {
+    if (!timers[timerId]) return;
+    
+    const timerContainer = document.getElementById(`timer-${timerId}`);
+    if (!timerContainer) return;
+    
+    const minutesInput = timerContainer.querySelector('.minutes-input');
+    const secondsInput = timerContainer.querySelector('.seconds-input');
+    
+    const minutes = parseInt(minutesInput.value) || 0;
+    const seconds = parseInt(secondsInput.value) || 0;
+    const totalSeconds = (minutes * 60) + seconds;
+    
+    if (totalSeconds > 0) {
+        pauseTimer(timerId);
+        timers[timerId].timeLeft = totalSeconds;
+        timerContainer.style.animation = '';
+        updateTimerDisplay(timerId);
         stopAllAlarms();
     }
+}
+
+// Play the selected alarm sound
+function playAlarmSound(timerId) {
+    const timerContainer = document.getElementById(`timer-${timerId}`);
+    if (!timerContainer) return;
     
-    // Set timer to a preset value
-    function setPresetTime(timerIndex, seconds) {
-        pauseTimer(timerIndex);
-        timers[timerIndex].timeLeft = seconds;
-        updateDisplay(timerIndex);
-        
-        const container = document.getElementById(`timer-container-${timerIndex}`);
-        if (container) {
-            container.style.animation = '';
-        }
-        
-        stopAllAlarms();
+    const soundSelect = timerContainer.querySelector('.sound-select');
+    const selectedSound = soundSelect.value;
+    
+    if (selectedSound !== 'none' && beepSounds[selectedSound]) {
+        stopAllAlarms(); // Stop any currently playing sounds
+        beepSounds[selectedSound].currentTime = 0;
+        beepSounds[selectedSound].loop = false;
+        beepSounds[selectedSound].play();
+    }
+}
+
+// Test a sound
+function testSound(timerId) {
+    const timerContainer = document.getElementById(`timer-${timerId}`);
+    if (!timerContainer) return;
+    
+    const soundSelect = timerContainer.querySelector('.sound-select');
+    const selectedSound = soundSelect.value;
+    
+    if (selectedSound !== 'none' && beepSounds[selectedSound]) {
+        stopAllAlarms(); // Stop any currently playing sounds
+        beepSounds[selectedSound].currentTime = 0;
+        beepSounds[selectedSound].loop = false;
+        beepSounds[selectedSound].play();
+    }
+}
+
+// Stop all alarm sounds
+function stopAllAlarms() {
+    for (const sound in beepSounds) {
+        beepSounds[sound].pause();
+        beepSounds[sound].currentTime = 0;
+    }
+}
+
+// Add a new timer
+function addNewTimer() {
+    // Check if we've reached the maximum number of timers
+    if (Object.keys(timers).length >= maxTimers) {
+        alert('Maximum number of timers reached (8)');
+        return;
     }
     
-    // Add time to the current timer
-    function addTime(timerIndex, seconds) {
-        timers[timerIndex].timeLeft += seconds;
-        updateDisplay(timerIndex);
+    const timerId = nextTimerId++;
+    
+    // Create the HTML for the new timer
+    const timerHTML = `
+    <div class="timer-container" id="timer-${timerId}">
+        <div class="delete-btn-container">
+            <button class="delete-btn" onclick="deleteTimer(${timerId})">×</button>
+        </div>
         
-        // If timer was at 0, it might need to be restarted
-        if (timers[timerIndex].timeLeft > 0) {
-            const container = document.getElementById(`timer-container-${timerIndex}`);
-            if (container) {
-                container.style.animation = '';
-            }
-            stopAllAlarms();
-        }
+        <div class="pc-name-container">
+            <input type="text" class="pc-name" placeholder="Character Name">
+        </div>
+        
+        <div class="timer-display">00:00</div>
+        
+        <div class="time-presets">
+            <button class="preset-btn" onclick="setPresetTime(${timerId}, 60)">1 min</button>
+            <button class="preset-btn" onclick="setPresetTime(${timerId}, 120)">2 min</button>
+            <button class="preset-btn" onclick="setPresetTime(${timerId}, 180)">3 min</button>
+            <button class="preset-btn" onclick="setPresetTime(${timerId}, 300)">5 min</button>
+        </div>
+        
+        <div class="add-time">
+            <button class="add-btn" onclick="addTime(${timerId}, 30)">+30 sec</button>
+        </div>
+        
+        <div class="custom-time">
+            <input type="number" class="minutes-input" min="0" max="60" value="2">
+            <label>min</label>
+            <input type="number" class="seconds-input" min="0" max="59" value="0">
+            <label>sec</label>
+            <button class="btn set-custom-btn" onclick="setCustomTime(${timerId})">Set Time</button>
+        </div>
+        
+        <div class="alarm-sound">
+            <label>Alarm:</label>
+            <select class="sound-select">
+                <option value="none" selected>None</option>
+                <option value="beep1">Beep 1</option>
+                <option value="beep2">Beep 2</option>
+                <option value="beep3">Beep 3</option>
+                <option value="beep4">Beep 4</option>
+                <option value="beep5">Beep 5</option>
+                <option value="beep6">Beep 6</option>
+                <option value="beep7">Beep 7</option>
+                <option value="beep8">Beep 8</option>
+                <option value="beep9">Beep 9</option>
+            </select>
+            <button class="btn test-sound-btn" onclick="testSound(${timerId})">Test</button>
+        </div>
+        
+        <div class="controls">
+            <button class="btn start-btn large-btn" onclick="startTimer(${timerId})">Start</button>
+            <button class="btn stop-btn" onclick="stopTimer(${timerId})">Stop</button>
+            <button class="btn pause-btn" onclick="pauseTimer(${timerId})">Pause</button>
+            <button class="btn btn-danger reset-btn" onclick="resetTimer(${timerId})">Reset</button>
+        </div>
+    </div>
+    `;
+    
+    // Add the new timer before the add button
+    const addButton = document.getElementById('add-timer-btn');
+    addButton.insertAdjacentHTML('beforebegin', timerHTML);
+    
+    // Initialize the timer
+    initializeTimer(timerId);
+    
+    // Hide add button if maximum is reached
+    if (Object.keys(timers).length >= maxTimers) {
+        addButton.style.display = 'none';
+    }
+}
+
+// Delete a timer
+function deleteTimer(timerId) {
+    // Prevent deleting the last timer
+    if (Object.keys(timers).length <= 1) {
+        alert('At least one timer must remain');
+        return;
     }
     
-    // Set custom time
-    function setCustomTime(timerIndex) {
-        const minutesInput = document.getElementById(`minutes-${timerIndex}`);
-        const secondsInput = document.getElementById(`seconds-${timerIndex}`);
-        if (!minutesInput || !secondsInput) return;
-        
-        const mins = parseInt(minutesInput.value) || 0;
-        const secs = parseInt(secondsInput.value) || 0;
-        const totalSeconds = (mins * 60) + secs;
-        
-        if (totalSeconds > 0) {
-            pauseTimer(timerIndex);
-            timers[timerIndex].timeLeft = totalSeconds;
-            updateDisplay(timerIndex);
-            
-            const container = document.getElementById(`timer-container-${timerIndex}`);
-            if (container) {
-                container.style.animation = '';
-            }
-            
-            stopAllAlarms();
-        }
+    // Stop the timer if it's running
+    if (timers[timerId] && timers[timerId].isRunning) {
+        pauseTimer(timerId);
     }
     
-    // Play the selected alarm sound
-    function playAlarm(timerIndex) {
-        stopAllAlarms(); // Stop any currently playing alarms
-        
-        const soundSelect = document.getElementById(`sound-select-${timerIndex}`);
-        if (!soundSelect) return;
-        
-        const selectedAlarm = soundSelect.value;
-        if (selectedAlarm === 'none') return;
-        
-        if (beepSounds[selectedAlarm]) {
-            // Set to play only once, not looping
-            beepSounds[selectedAlarm].loop = false;
-            beepSounds[selectedAlarm].play();
-            currentlyPlayingSound = selectedAlarm;
-        }
+    // Remove from the DOM
+    const timerElement = document.getElementById(`timer-${timerId}`);
+    if (timerElement) {
+        timerElement.remove();
     }
     
-    // Test the selected alarm sound
-    function testSound(timerIndex) {
-        stopAllAlarms();
-        
-        const soundSelect = document.getElementById(`sound-select-${timerIndex}`);
-        if (!soundSelect) return;
-        
-        const selectedAlarm = soundSelect.value;
-        if (selectedAlarm === 'none') return;
-        
-        if (beepSounds[selectedAlarm]) {
-            beepSounds[selectedAlarm].loop = false;
-            beepSounds[selectedAlarm].play();
-        }
-    }
+    // Remove from tracking
+    delete timers[timerId];
     
-    // Function to stop all alarm sounds across all timers
-    function stopAllAlarms() {
-        // Stop all beep sounds
-        for (const sound in beepSounds) {
-            beepSounds[sound].pause();
-            beepSounds[sound].currentTime = 0;
-        }
-        currentlyPlayingSound = null;
-    }
-});
+    // Show the add button if it was hidden
+    document.getElementById('add-timer-btn').style.display = 'flex';
+}
