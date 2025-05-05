@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mothership TTRPG Timer</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #0f0;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: radial-gradient(rgba(0, 50, 0, 0.3) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(0, 20, 0, 0.7);
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        h1 {
+            margin-top: 0;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+            font-size: 2rem;
+        }
+        
+        .timer-display {
+            font-size: 5rem;
+            margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.9);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background-color: rgba(0, 30, 0, 0.8);
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 5px;
+        }
+        
+        .btn:hover {
+            background-color: rgba(0, 60, 0, 0.8);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-danger {
+            background-color: rgba(30, 0, 0, 0.8);
+            color: #f00;
+            border-color: #f00;
+        }
+        
+        .btn-danger:hover {
+            background-color: rgba(60, 0, 0, 0.8);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        
+        .time-presets {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .preset-btn {
+            background-color: rgba(0, 20, 0, 0.8);
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .preset-btn:hover {
+            background-color: rgba(0, 40, 0, 0.8);
+        }
+
+        .add-time {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .add-btn {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            background-color: rgba(0, 20, 0, 0.8);
+            color: #0f0;
+            border: 1px solid #0f0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .add-btn:hover {
+            background-color: rgba(0, 40, 0, 0.8);
+        }
+        
+        .custom-time {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .custom-time input {
+            background-color: rgba(0, 20, 0, 0.8);
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 8px;
+            width: 60px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .alarm-sound {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        select {
+            background-color: rgba(0, 20, 0, 0.8);
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px;
+            font-family: 'Courier New', monospace;
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            .timer-display {
+                font-size: 3.5rem;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animation for when timer reaches zero */
+        @keyframes danger-flash {
+            0% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); border-color: #f00; }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); border-color: #ff5555; }
+            100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); border-color: #f00; }
+        }
+        
+        .danger {
+            animation: danger-flash 0.5s infinite;
+            color: #f00;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.9);
+        }
+
+        /* Animation for when timer is below 10 seconds */
+        @keyframes warning-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .warning {
+            color: #ff0;
+            text-shadow: 0 0 15px rgba(255, 255, 0, 0.9);
+            animation: warning-pulse 1s infinite;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #0a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MOTHERSHIP TTRPG TIMER</h1>
+        
+        <div class="timer-display" id="timer">00:00</div>
+        
+        <div class="time-presets">
+            <button class="preset-btn" data-time="60">1 min</button>
+            <button class="preset-btn" data-time="120">2 min</button>
+            <button class="preset-btn" data-time="180">3 min</button>
+            <button class="preset-btn" data-time="300">5 min</button>
+            <button class="preset-btn" data-time="600">10 min</button>
+        </div>
+        
+        <div class="custom-time">
+            <input type="number" id="minutes" min="0" max="60" value="2">
+            <label for="minutes">min</label>
+            <input type="number" id="seconds" min="0" max="59" value="0">
+            <label for="seconds">sec</label>
+            <button class="btn" id="set-custom">Set</button>
+        </div>
+        
+        <div class="add-time">
+            <button class="add-btn" data-add="30">+30 sec</button>
+            <button class="add-btn" data-add="60">+1 min</button>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="start-btn">Start</button>
+            <button class="btn" id="pause-btn">Pause</button>
+            <button class="btn btn-danger" id="reset-btn">Reset</button>
+        </div>
+        
+        <div class="alarm-sound">
+            <label for="sound-select">Alarm:</label>
+            <select id="sound-select">
+                <option value="alarm1">Klaxon</option>
+                <option value="alarm2">Beep</option>
+                <option value="alarm3">Siren</option>
+                <option value="none">None</option>
+            </select>
+            <button class="btn" id="test-sound">Test</button>
+        </div>
+        
+        <div class="footer">
+            For Mothership TTRPG - Panic in deep space
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Audio elements for alarms
+            const alarm1 = new Audio('https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js');
+            const alarm2 = new Audio('https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js');
+            const alarm3 = new Audio('https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js');
+            
+            // Set up alarm sounds using base64 data
+            alarm1.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAJrQBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dX///////////8AAAA5TEFNRTMuOTlyAm4AAAAALgkAABRGJAN7TgAARgAACa3SsOqYAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuOTkuNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=";
+            alarm2.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAMAAAThwAUFBQUFBQsLCwsLCxERERERERmZmZmZmaGhoaGhoampqampqbFxcXFxcXi4uLi4uL///////////////////8AAAA5TEFNRTMuOTlyAm4AAAAALiEAABRGJAOmTgAARgAAE4c+M9qQAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuOTkuNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=";
+            alarm3.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAKAAAKYgAbGxsbGxsfHx8fHx8zMzMzMzNGRkZGRkZtbW1tbW15eXl5eXl5iYmJiYmJubm5ubm5ucnJycnJyfLy8vLy8v///////////wAAADJMQU1FMy45OS41VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMQAAAGkAAAAAAAANIAAAARMQU1FMy45OS41VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==";
+
+            // DOM Elements
+            const timerDisplay = document.getElementById('timer');
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            const addTimeBtns = document.querySelectorAll('.add-btn');
+            const setCustomBtn = document.getElementById('set-custom');
+            const minutesInput = document.getElementById('minutes');
+            const secondsInput = document.getElementById('seconds');
+            const soundSelect = document.getElementById('sound-select');
+            const testSoundBtn = document.getElementById('test-sound');
+            const container = document.querySelector('.container');
+            
+            // Timer variables
+            let timeLeft = 120; // Default 2 minutes
+            let timerId;
+            let isRunning = false;
+            
+            // Format time as MM:SS
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const secs = (seconds % 60).toString().padStart(2, '0');
+                return `${mins}:${secs}`;
+            }
+            
+            // Update timer display
+            function updateDisplay() {
+                timerDisplay.textContent = formatTime(timeLeft);
+                
+                // Reset classes
+                timerDisplay.classList.remove('warning', 'danger');
+                container.style.animation = '';
+                
+                // Add warning class when time is below 10 seconds
+                if (timeLeft <= 10 && timeLeft > 0) {
+                    timerDisplay.classList.add('warning');
+                }
+                
+                // Add danger class when time is up
+                if (timeLeft === 0) {
+                    timerDisplay.classList.add('danger');
+                    container.style.animation = 'danger-flash 0.5s infinite';
+                    playAlarm();
+                }
+            }
+            
+            // Start the timer
+            function startTimer() {
+                if (!isRunning) {
+                    isRunning = true;
+                    timerId = setInterval(() => {
+                        if (timeLeft > 0) {
+                            timeLeft--;
+                            updateDisplay();
+                        } else {
+                            clearInterval(timerId);
+                            isRunning = false;
+                        }
+                    }, 1000);
+                }
+            }
+            
+            // Pause the timer
+            function pauseTimer() {
+                clearInterval(timerId);
+                isRunning = false;
+            }
+            
+            // Reset the timer
+            function resetTimer() {
+                pauseTimer();
+                timeLeft = 120; // Reset to default 2 minutes
+                updateDisplay();
+                container.style.animation = '';
+                stopAlarm();
+            }
+            
+            // Set timer to a preset value
+            function setPresetTime(seconds) {
+                pauseTimer();
+                timeLeft = seconds;
+                updateDisplay();
+                container.style.animation = '';
+                stopAlarm();
+            }
+            
+            // Add time to the current timer
+            function addTime(seconds) {
+                timeLeft += seconds;
+                updateDisplay();
+                
+                // If timer was at 0, it might need to be restarted
+                if (timeLeft > 0) {
+                    container.style.animation = '';
+                    stopAlarm();
+                }
+            }
+            
+            // Set custom time
+            function setCustomTime() {
+                const mins = parseInt(minutesInput.value) || 0;
+                const secs = parseInt(secondsInput.value) || 0;
+                const totalSeconds = (mins * 60) + secs;
+                
+                if (totalSeconds > 0) {
+                    pauseTimer();
+                    timeLeft = totalSeconds;
+                    updateDisplay();
+                    container.style.animation = '';
+                    stopAlarm();
+                }
+            }
+            
+            // Play the selected alarm sound
+            function playAlarm() {
+                stopAlarm(); // Stop any currently playing alarms
+                
+                const selectedAlarm = soundSelect.value;
+                if (selectedAlarm === 'none') return;
+                
+                if (selectedAlarm === 'alarm1') {
+                    alarm1.loop = true;
+                    alarm1.play();
+                } else if (selectedAlarm === 'alarm2') {
+                    alarm2.loop = true;
+                    alarm2.play();
+                } else if (selectedAlarm === 'alarm3') {
+                    alarm3.loop = true;
+                    alarm3.play();
+                }
+            }
+            
+            // Stop all alarm sounds
+            function stopAlarm() {
+                alarm1.pause();
+                alarm1.currentTime = 0;
+                alarm2.pause();
+                alarm2.currentTime = 0;
+                alarm3.pause();
+                alarm3.currentTime = 0;
+            }
+            
+            // Test the selected alarm sound
+            function testSound() {
+                stopAlarm();
+                const selectedAlarm = soundSelect.value;
+                if (selectedAlarm === 'none') return;
+                
+                if (selectedAlarm === 'alarm1') {
+                    alarm1.loop = false;
+                    alarm1.play();
+                } else if (selectedAlarm === 'alarm2') {
+                    alarm2.loop = false;
+                    alarm2.play();
+                } else if (selectedAlarm === 'alarm3') {
+                    alarm3.loop = false;
+                    alarm3.play();
+                }
+            }
+            
+            // Initialize timer display
+            updateDisplay();
+            
+            // Event Listeners
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
+            
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const time = parseInt(btn.getAttribute('data-time'));
+                    setPresetTime(time);
+                });
+            });
+            
+            addTimeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const time = parseInt(btn.getAttribute('data-add'));
+                    addTime(time);
+                });
+            });
+            
+            setCustomBtn.addEventListener('click', setCustomTime);
+            testSoundBtn.addEventListener('click', testSound);
+        });
+    </script>
+</body>
+</html>
