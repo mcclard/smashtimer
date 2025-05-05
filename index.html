@@ -282,8 +282,11 @@
 
         // Add a new timer
         function addNewTimer() {
+            // Count current timers on screen
+            const currentTimersCount = document.querySelectorAll('.timer-container').length;
+            
             // Check if we've reached the maximum
-            if (timerCount >= maxTimers) {
+            if (currentTimersCount >= maxTimers) {
                 alert('Maximum number of timers reached (8)');
                 return;
             }
@@ -357,10 +360,8 @@
             // Initialize the timer value
             timerValues[newTimerId] = 120; // 2 minutes
             
-            // Hide add button if at max
-            if (timerCount >= maxTimers) {
-                addButton.style.display = 'none';
-            }
+            // Update add button visibility
+            updateAddButtonVisibility();
         }
 
         // Delete a timer
@@ -384,8 +385,20 @@
             delete timerIntervals[timerId];
             delete timerValues[timerId];
             
-            // Show the add button if it was hidden
-            document.getElementById('add-timer-btn').style.display = 'flex';
+            // Update add button visibility
+            updateAddButtonVisibility();
+        }
+        
+        // Check if add button should be visible based on current timer count
+        function updateAddButtonVisibility() {
+            const currentTimersCount = document.querySelectorAll('.timer-container').length;
+            const addButton = document.getElementById('add-timer-btn');
+            
+            if (currentTimersCount >= maxTimers) {
+                addButton.style.display = 'none';
+            } else {
+                addButton.style.display = 'flex';
+            }
         }
     </script>
 </body>
