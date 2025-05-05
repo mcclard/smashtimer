@@ -1,0 +1,205 @@
+/* Mothership TTRPG Timer Stylesheet */
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #000;
+    color: #0f0;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    background-image: radial-gradient(rgba(0, 50, 0, 0.3) 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(0, 20, 0, 0.7);
+    border: 2px solid #0f0;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+h1 {
+    margin-top: 0;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+    font-size: 2rem;
+}
+
+.timer-display {
+    font-size: 5rem;
+    margin: 20px 0;
+    font-weight: bold;
+    text-shadow: 0 0 15px rgba(0, 255, 0, 0.9);
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.btn {
+    background-color: rgba(0, 30, 0, 0.8);
+    color: #0f0;
+    border: 1px solid #0f0;
+    padding: 10px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background-color: rgba(0, 60, 0, 0.8);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.btn-danger {
+    background-color: rgba(30, 0, 0, 0.8);
+    color: #f00;
+    border-color: #f00;
+}
+
+.btn-danger:hover {
+    background-color: rgba(60, 0, 0, 0.8);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.time-presets {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.preset-btn {
+    background-color: rgba(0, 20, 0, 0.8);
+    color: #0f0;
+    border: 1px solid #0f0;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.preset-btn:hover {
+    background-color: rgba(0, 40, 0, 0.8);
+}
+
+.add-time {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    background-color: rgba(0, 20, 0, 0.8);
+    color: #0f0;
+    border: 1px solid #0f0;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.add-btn:hover {
+    background-color: rgba(0, 40, 0, 0.8);
+}
+
+.custom-time {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.custom-time input {
+    background-color: rgba(0, 20, 0, 0.8);
+    color: #0f0;
+    border: 1px solid #0f0;
+    padding: 8px;
+    width: 60px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.alarm-sound {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+select {
+    background-color: rgba(0, 20, 0, 0.8);
+    color: #0f0;
+    border: 1px solid #0f0;
+    padding: 5px;
+    font-family: 'Courier New', monospace;
+    border-radius: 5px;
+}
+
+@media (max-width: 600px) {
+    .timer-display {
+        font-size: 3.5rem;
+    }
+    
+    .controls {
+        gap: 10px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Animation for when timer reaches zero */
+@keyframes danger-flash {
+    0% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); border-color: #f00; }
+    50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); border-color: #ff5555; }
+    100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); border-color: #f00; }
+}
+
+.danger {
+    animation: danger-flash 0.5s infinite;
+    color: #f00;
+    text-shadow: 0 0 15px rgba(255, 0, 0, 0.9);
+}
+
+/* Animation for when timer is below 10 seconds */
+@keyframes warning-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.warning {
+    color: #ff0;
+    text-shadow: 0 0 15px rgba(255, 255, 0, 0.9);
+    animation: warning-pulse 1s infinite;
+}
+
+.footer {
+    margin-top: 30px;
+    font-size: 0.8rem;
+    color: #0a0;
+}
