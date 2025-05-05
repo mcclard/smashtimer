@@ -339,6 +339,12 @@ footer {
         font-size: 0.8rem;
     }
     
+    .large-btn, .stop-btn {
+        font-size: 1.1rem;
+        padding: 10px 20px;
+        margin: 5px;
+    }
+    
     .custom-time input {
         width: 45px;
         padding: 5px;
@@ -381,6 +387,12 @@ footer {
     .btn, .preset-btn, .add-btn {
         padding: 5px 10px;
         font-size: 0.75rem;
+    }
+    
+    .large-btn, .stop-btn {
+        font-size: 1rem;
+        padding: 8px 16px;
+        margin: 4px;
     }
     
     .add-timer-container {
