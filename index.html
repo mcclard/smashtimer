@@ -5,51 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smash and Grab Timer</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
     <header>
         <h1>SMASH AND GRAB TIMER</h1>
     </header>
     
-    <div class="timers-container">
+    <div id="timers-container">
         <!-- Timer 1 -->
-        <div class="container" id="timer-container-1">
-            <div class="pc-name-container">
-                <input type="text" class="pc-name" id="pc-name-1" placeholder="Character Name">
+        <div class="timer-container" id="timer-1">
+            <div class="delete-btn-container">
+                <button class="delete-btn" onclick="deleteTimer(1)">×</button>
             </div>
             
-            <div class="timer-display" id="timer-1">00:00</div>
+            <div class="pc-name-container">
+                <input type="text" class="pc-name" placeholder="Character Name">
+            </div>
+            
+            <div class="timer-display">00:00</div>
             
             <div class="time-presets">
-                <button class="preset-btn" data-time="60" data-timer="1">1 min</button>
-                <button class="preset-btn" data-time="120" data-timer="1">2 min</button>
-                <button class="preset-btn" data-time="180" data-timer="1">3 min</button>
-                <button class="preset-btn" data-time="300" data-timer="1">5 min</button>
+                <button class="preset-btn" onclick="setPresetTime(1, 60)">1 min</button>
+                <button class="preset-btn" onclick="setPresetTime(1, 120)">2 min</button>
+                <button class="preset-btn" onclick="setPresetTime(1, 180)">3 min</button>
+                <button class="preset-btn" onclick="setPresetTime(1, 300)">5 min</button>
             </div>
             
             <div class="add-time">
-                <button class="add-btn" data-add="30" data-timer="1">+30 sec</button>
+                <button class="add-btn" onclick="addTime(1, 30)">+30 sec</button>
             </div>
             
             <div class="custom-time">
-                <input type="number" class="minutes" id="minutes-1" min="0" max="60" value="2">
-                <label for="minutes-1">min</label>
-                <input type="number" class="seconds" id="seconds-1" min="0" max="59" value="0">
-                <label for="seconds-1">sec</label>
-                <button class="btn set-custom-btn" data-timer="1">Set Time</button>
-            </div>
-            
-            <div class="controls">
-                <button class="btn start-btn large-btn" data-timer="1">Start</button>
-                <button class="btn stop-btn" data-timer="1">Stop</button>
-                <button class="btn pause-btn" data-timer="1">Pause</button>
-                <button class="btn btn-danger reset-btn" data-timer="1">Reset</button>
+                <input type="number" class="minutes-input" min="0" max="60" value="2">
+                <label>min</label>
+                <input type="number" class="seconds-input" min="0" max="59" value="0">
+                <label>sec</label>
+                <button class="btn set-custom-btn" onclick="setCustomTime(1)">Set Time</button>
             </div>
             
             <div class="alarm-sound">
-                <label for="sound-select-1">Alarm:</label>
-                <select class="sound-select" id="sound-select-1" data-timer="1">
+                <label>Alarm:</label>
+                <select class="sound-select">
                     <option value="none" selected>None</option>
                     <option value="beep1">Beep 1</option>
                     <option value="beep2">Beep 2</option>
@@ -61,216 +57,20 @@
                     <option value="beep8">Beep 8</option>
                     <option value="beep9">Beep 9</option>
                 </select>
-                <button class="btn test-sound-btn" data-timer="1">Test</button>
+                <button class="btn test-sound-btn" onclick="testSound(1)">Test</button>
+            </div>
+            
+            <div class="controls">
+                <button class="btn start-btn large-btn" onclick="startTimer(1)">Start</button>
+                <button class="btn stop-btn" onclick="stopTimer(1)">Stop</button>
+                <button class="btn pause-btn" onclick="pauseTimer(1)">Pause</button>
+                <button class="btn btn-danger reset-btn" onclick="resetTimer(1)">Reset</button>
             </div>
         </div>
 
-        <!-- Timer 2 -->
-        <div class="container" id="timer-container-2">
-            <div class="pc-name-container">
-                <input type="text" class="pc-name" id="pc-name-2" placeholder="Character Name">
-            </div>
-            
-            <div class="timer-display" id="timer-2">00:00</div>
-            
-            <div class="time-presets">
-                <button class="preset-btn" data-time="60" data-timer="2">1 min</button>
-                <button class="preset-btn" data-time="120" data-timer="2">2 min</button>
-                <button class="preset-btn" data-time="180" data-timer="2">3 min</button>
-                <button class="preset-btn" data-time="300" data-timer="2">5 min</button>
-            </div>
-            
-            <div class="add-time">
-                <button class="add-btn" data-add="30" data-timer="2">+30 sec</button>
-            </div>
-            
-            <div class="custom-time">
-                <input type="number" class="minutes" id="minutes-2" min="0" max="60" value="2">
-                <label for="minutes-2">min</label>
-                <input type="number" class="seconds" id="seconds-2" min="0" max="59" value="0">
-                <label for="seconds-2">sec</label>
-                <button class="btn set-custom-btn" data-timer="2">Set Time</button>
-            </div>
-            
-            <div class="controls">
-                <button class="btn start-btn large-btn" data-timer="2">Start</button>
-                <button class="btn stop-btn" data-timer="2">Stop</button>
-                <button class="btn pause-btn" data-timer="2">Pause</button>
-                <button class="btn btn-danger reset-btn" data-timer="2">Reset</button>
-            </div>
-            
-            <div class="alarm-sound">
-                <label for="sound-select-2">Alarm:</label>
-                <select class="sound-select" id="sound-select-2" data-timer="2">
-                    <option value="none" selected>None</option>
-                    <option value="beep1">Beep 1</option>
-                    <option value="beep2">Beep 2</option>
-                    <option value="beep3">Beep 3</option>
-                    <option value="beep4">Beep 4</option>
-                    <option value="beep5">Beep 5</option>
-                    <option value="beep6">Beep 6</option>
-                    <option value="beep7">Beep 7</option>
-                    <option value="beep8">Beep 8</option>
-                    <option value="beep9">Beep 9</option>
-                </select>
-                <button class="btn test-sound-btn" data-timer="2">Test</button>
-            </div>
-        </div>
-
-        <!-- Timer 3 -->
-        <div class="container" id="timer-container-3">
-            <div class="pc-name-container">
-                <input type="text" class="pc-name" id="pc-name-3" placeholder="Character Name">
-            </div>
-            
-            <div class="timer-display" id="timer-3">00:00</div>
-            
-            <div class="time-presets">
-                <button class="preset-btn" data-time="60" data-timer="3">1 min</button>
-                <button class="preset-btn" data-time="120" data-timer="3">2 min</button>
-                <button class="preset-btn" data-time="180" data-timer="3">3 min</button>
-                <button class="preset-btn" data-time="300" data-timer="3">5 min</button>
-            </div>
-            
-            <div class="add-time">
-                <button class="add-btn" data-add="30" data-timer="3">+30 sec</button>
-            </div>
-            
-            <div class="custom-time">
-                <input type="number" class="minutes" id="minutes-3" min="0" max="60" value="2">
-                <label for="minutes-3">min</label>
-                <input type="number" class="seconds" id="seconds-3" min="0" max="59" value="0">
-                <label for="seconds-3">sec</label>
-                <button class="btn set-custom-btn" data-timer="3">Set Time</button>
-            </div>
-            
-            <div class="controls">
-                <button class="btn start-btn large-btn" data-timer="3">Start</button>
-                <button class="btn stop-btn" data-timer="3">Stop</button>
-                <button class="btn pause-btn" data-timer="3">Pause</button>
-                <button class="btn btn-danger reset-btn" data-timer="3">Reset</button>
-            </div>
-            
-            <div class="alarm-sound">
-                <label for="sound-select-3">Alarm:</label>
-                <select class="sound-select" id="sound-select-3" data-timer="3">
-                    <option value="none" selected>None</option>
-                    <option value="beep1">Beep 1</option>
-                    <option value="beep2">Beep 2</option>
-                    <option value="beep3">Beep 3</option>
-                    <option value="beep4">Beep 4</option>
-                    <option value="beep5">Beep 5</option>
-                    <option value="beep6">Beep 6</option>
-                    <option value="beep7">Beep 7</option>
-                    <option value="beep8">Beep 8</option>
-                    <option value="beep9">Beep 9</option>
-                </select>
-                <button class="btn test-sound-btn" data-timer="3">Test</button>
-            </div>
-        </div>
-
-        <!-- Timer 4 -->
-        <div class="container" id="timer-container-4">
-            <div class="pc-name-container">
-                <input type="text" class="pc-name" id="pc-name-4" placeholder="Character Name">
-            </div>
-            
-            <div class="timer-display" id="timer-4">00:00</div>
-            
-            <div class="time-presets">
-                <button class="preset-btn" data-time="60" data-timer="4">1 min</button>
-                <button class="preset-btn" data-time="120" data-timer="4">2 min</button>
-                <button class="preset-btn" data-time="180" data-timer="4">3 min</button>
-                <button class="preset-btn" data-time="300" data-timer="4">5 min</button>
-            </div>
-            
-            <div class="add-time">
-                <button class="add-btn" data-add="30" data-timer="4">+30 sec</button>
-            </div>
-            
-            <div class="custom-time">
-                <input type="number" class="minutes" id="minutes-4" min="0" max="60" value="2">
-                <label for="minutes-4">min</label>
-                <input type="number" class="seconds" id="seconds-4" min="0" max="59" value="0">
-                <label for="seconds-4">sec</label>
-                <button class="btn set-custom-btn" data-timer="4">Set Time</button>
-            </div>
-            
-            <div class="controls">
-                <button class="btn start-btn large-btn" data-timer="4">Start</button>
-                <button class="btn stop-btn" data-timer="4">Stop</button>
-                <button class="btn pause-btn" data-timer="4">Pause</button>
-                <button class="btn btn-danger reset-btn" data-timer="4">Reset</button>
-            </div>
-            
-            <div class="alarm-sound">
-                <label for="sound-select-4">Alarm:</label>
-                <select class="sound-select" id="sound-select-4" data-timer="4">
-                    <option value="none" selected>None</option>
-                    <option value="beep1">Beep 1</option>
-                    <option value="beep2">Beep 2</option>
-                    <option value="beep3">Beep 3</option>
-                    <option value="beep4">Beep 4</option>
-                    <option value="beep5">Beep 5</option>
-                    <option value="beep6">Beep 6</option>
-                    <option value="beep7">Beep 7</option>
-                    <option value="beep8">Beep 8</option>
-                    <option value="beep9">Beep 9</option>
-                </select>
-                <button class="btn test-sound-btn" data-timer="4">Test</button>
-            </div>
-        </div>
-
-        <!-- Timer 5 -->
-        <div class="container" id="timer-container-5">
-            <div class="pc-name-container">
-                <input type="text" class="pc-name" id="pc-name-5" placeholder="Character Name">
-            </div>
-            
-            <div class="timer-display" id="timer-5">00:00</div>
-            
-            <div class="time-presets">
-                <button class="preset-btn" data-time="60" data-timer="5">1 min</button>
-                <button class="preset-btn" data-time="120" data-timer="5">2 min</button>
-                <button class="preset-btn" data-time="180" data-timer="5">3 min</button>
-                <button class="preset-btn" data-time="300" data-timer="5">5 min</button>
-            </div>
-            
-            <div class="add-time">
-                <button class="add-btn" data-add="30" data-timer="5">+30 sec</button>
-            </div>
-            
-            <div class="custom-time">
-                <input type="number" class="minutes" id="minutes-5" min="0" max="60" value="2">
-                <label for="minutes-5">min</label>
-                <input type="number" class="seconds" id="seconds-5" min="0" max="59" value="0">
-                <label for="seconds-5">sec</label>
-                <button class="btn set-custom-btn" data-timer="5">Set Time</button>
-            </div>
-            
-            <div class="controls">
-                <button class="btn start-btn large-btn" data-timer="5">Start</button>
-                <button class="btn stop-btn" data-timer="5">Stop</button>
-                <button class="btn pause-btn" data-timer="5">Pause</button>
-                <button class="btn btn-danger reset-btn" data-timer="5">Reset</button>
-            </div>
-            
-            <div class="alarm-sound">
-                <label for="sound-select-5">Alarm:</label>
-                <select class="sound-select" id="sound-select-5" data-timer="5">
-                    <option value="none" selected>None</option>
-                    <option value="beep1">Beep 1</option>
-                    <option value="beep2">Beep 2</option>
-                    <option value="beep3">Beep 3</option>
-                    <option value="beep4">Beep 4</option>
-                    <option value="beep5">Beep 5</option>
-                    <option value="beep6">Beep 6</option>
-                    <option value="beep7">Beep 7</option>
-                    <option value="beep8">Beep 8</option>
-                    <option value="beep9">Beep 9</option>
-                </select>
-                <button class="btn test-sound-btn" data-timer="5">Test</button>
-            </div>
+        <!-- Add Timer Button -->
+        <div id="add-timer-btn" onclick="addNewTimer()">
+            <div class="add-timer-button">+</div>
         </div>
     </div>
 
